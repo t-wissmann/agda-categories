@@ -52,7 +52,7 @@ record FactorizationStructure : Set (o ⊔ ℓ ⊔ eq ⊔ ℓℰ ⊔ ℓℳ) whe
     -- 2. ℰ and ℳ are closed under compositions with isomorphisms:
     Iso∘ℰ : ∀ {h : B ⇒ C} → IsIso h → (e : A ↠ B) → ℰ (h ∘ mor e)
     ℳ∘Iso : ∀ (m : B ↣ C) → {h : A ⇒ B} → IsIso h → ℳ (mor m ∘ h)
-    -- 3. every computative square of the form
+    -- 3. every commutative square of the form
     --      e
     --   A ───>> B
     --   │     / │
