@@ -20,17 +20,32 @@ open import Categories.Morphism.Lifts
 open import Categories.Morphism.FactorizationStructure
 open import Categories.Morphism.FactorizationStructure.Core
 
-Diagonal^op : ∀ {A B C D : Category.Obj 𝒞}
+Diagonalᵒᵖ : ∀ {A B C D : Category.Obj 𝒞}
                 {e : 𝒞 [ A , B ]} {f : 𝒞 [ A , C ]}
                 {g : 𝒞 [ B , D ]} {m : 𝒞 [ C , D ]}
                 → Diagonal 𝒞 e f g m
                 → Diagonal (Category.op 𝒞) m g f e
-Diagonal^op diag = record
+Diagonalᵒᵖ diag = record
   { d = diag .d
   ; commˡ = commʳ diag
   ; commʳ = commˡ diag
   }
   where open Diagonal
+
+_ᵒᵖ : {p : Level} {M : MorphismClass 𝒞 p}
+      → {A B : Category.Obj 𝒞}
+      → MorphismClassMember 𝒞 M A B
+      → MorphismClassMember (Category.op 𝒞) M B A
+_ᵒᵖ f = record { mor = f .mor ; in-class = f .in-class }
+  where open MorphismClassMember
+
+
+_≅ᵒᵖ : {A B : Category.Obj 𝒞} → {h : 𝒞 [ A , B ]} → IsIso 𝒞 h → IsIso (Category.op 𝒞) h
+_≅ᵒᵖ {h = h} h-iso = record
+  { inv = inv
+  ; iso = record { isoˡ = isoʳ ; isoʳ = isoˡ }
+  }
+  where open IsIso h-iso
 
 dual-factorizations : {ℰ : MorphismClass 𝒞 ℓℰ} {ℳ : MorphismClass 𝒞 ℓℳ}
                     → [ ℰ , ℳ ]-structured 𝒞
@@ -39,47 +54,28 @@ dual-factorizations {𝒞 = 𝒞} factorizationstructure = record
   { ℰ-resp-≈ = ℳ-resp-≈
   ; ℳ-resp-≈ = ℰ-resp-≈
   ; factor = λ f →
-           let
-             open Factorization (factor f)
-           in
+           let open Factorization (factor f) in
            record
            { Im = Im
-           ; e = record { mor = m .mor ; in-class = m .in-class }
-           ; m = record { mor = e .mor ; in-class = e .in-class }
+           ; e = m ᵒᵖ
+           ; m = e ᵒᵖ
            ; m∘e≈h = m∘e≈h
            }
-  ; Iso∘ℰ = λ h m →
-      ℳ∘Iso
-      (record { mor = m .mor ; in-class = m .in-class })
-      (record { inv = h .inv
-              ; iso = record
-                      { isoˡ = isoʳ (h .iso)
-                      ; isoʳ = isoˡ (h .iso) } })
-  ; ℳ∘Iso = λ e h →
-      Iso∘ℰ
-      (record { inv = h .inv
-              ; iso = record
-                    { isoˡ = isoʳ (h .iso)
-                    ; isoʳ = isoˡ (h .iso)}})
-      (record { mor = e .mor ; in-class = e .in-class })
-  ; diagonalization = λ e^op m^op comm →
+  ; Iso∘ℰ = λ h m → ℳ∘Iso (m ᵒᵖ) (h ≅ᵒᵖ)
+  ; ℳ∘Iso = λ e h → Iso∘ℰ (h ≅ᵒᵖ) (e ᵒᵖ)
+  ; diagonalization = λ eᵒᵖ mᵒᵖ comm →
       let
-        e = record { mor = m^op .mor ; in-class = m^op .in-class }
-        m = record { mor = e^op .mor ; in-class = e^op .in-class }
-        d : UniqueDiagonal 𝒞 (m^op .mor) _ _ (e^op .mor)
-        d = diagonalization e m (Equiv.sym comm)
+        d : UniqueDiagonal 𝒞 (mᵒᵖ .mor) _ _ (eᵒᵖ .mor)
+        d = diagonalization (mᵒᵖ ᵒᵖ) (eᵒᵖ ᵒᵖ) (Equiv.sym comm)
       in
       record
-      { diagonal = Diagonal^op {𝒞 = 𝒞} (d .diagonal)
-      ; unique = λ v → (d. unique) (Diagonal^op v)
+      { diagonal = Diagonalᵒᵖ {𝒞 = 𝒞} (d .diagonal)
+      ; unique = λ v → (d .unique) (Diagonalᵒᵖ v)
       }
   }
   where
     open FactorizationStructure factorizationstructure
-    open MorphismClassMember
+    open MorphismClassMember using (mor)
     open Category 𝒞
-    open IsIso
-    open Iso
-    open Diagonal
     open UniqueDiagonal
 
