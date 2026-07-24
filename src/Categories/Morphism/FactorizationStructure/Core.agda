@@ -4,7 +4,7 @@ open import Categories.Category
 open import Categories.Morphism.Lifts using (MorphismClass)
 
 
--- Consider a category 𝒞 and to morphism classes ℰ and ℳ.
+-- Consider a category 𝒞 and two morphism classes ℰ and ℳ.
 -- The level of the morphism equalities is called `eq`
 -- such that the identifier `e` stays fresh for members of ℰ.
 module Categories.Morphism.FactorizationStructure.Core
